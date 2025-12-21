@@ -1,0 +1,7 @@
+/* Ensure these are in your global CSS file */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+

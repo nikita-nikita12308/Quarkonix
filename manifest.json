@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Free-sor",
+  "version": "1.0.0",
+  "action": { "default_title": "Open Free-sor" },
+  "side_panel": { "default_path": "index.html" },
+  "permissions": ["sidePanel", "storage", "tabs"],
+  "host_permissions": ["*://chatgpt.com/*", "*://gemini.google.com/*", "*://claude.ai/*"],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content/index.ts"],
+      "matches": ["*://chatgpt.com/*", "*://gemini.google.com/*", "*://claude.ai/*"]
+    }
+  ]
+}
