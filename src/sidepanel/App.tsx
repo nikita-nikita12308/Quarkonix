@@ -3,6 +3,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
+import TerminalView from "./terminal/TerminalView.tsx";
 
 const scrollFix = `
   .cm-theme-vscode-dark, .cm-editor { 
@@ -49,7 +50,7 @@ const scrollFix = `
   }
 `;
 
-type ViewState = 'EDITOR' | 'CONTEXT' | 'LOGS' | 'DIFF';
+type ViewState = 'EDITOR' | 'CONTEXT' | 'LOGS' | 'DIFF' | 'TERMINAL';
 
 interface EditorTab {
     id: string;
@@ -103,6 +104,13 @@ export default function App() {
 
     const addLog = (msg: string) => {
         setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 49)]);
+    };
+
+    const captureTerminalError = (text: string) => {
+        setCapturedSelection(text);
+        setIsPrompting(true);
+        setAiQuestion("I encountered this error in my terminal. Can you help me fix it?");
+        addLog("Terminal output captured for AI.");
     };
 
     // Selection tooltip field - creates the "Ask AI" button
@@ -582,6 +590,12 @@ ${projectMap}
                         {activeTab?.isDirty && <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-orange-500">👹</span>}
                     </button>
                     <button onClick={() => setActiveView('CONTEXT')} className={`w-full py-4 ${activeView === 'CONTEXT' ? 'text-white border-l-2 border-[#007acc]' : 'text-zinc-500'}`}>🪾</button>
+                    <button
+                        onClick={() => setActiveView('TERMINAL')}
+                        className={`w-full py-4 ${activeView === 'TERMINAL' ? 'text-white border-l-2 border-[#007acc]' : 'text-zinc-500'}`}
+                    >
+                        🐚
+                    </button>
                     <button onClick={() => setActiveView('LOGS')} className={`w-full mt-auto py-4 ${activeView === 'LOGS' ? 'text-white border-l-2 border-[#007acc]' : 'text-zinc-500'}`}>🗃️</button>
                 </aside>
 
@@ -732,6 +746,9 @@ ${projectMap}
                                     <pre className="p-6 text-[16px] font-bold tracking-wide text-zinc-500 whitespace-pre">{projectMap || "// Connect project to see skeleton..."}</pre>
                                 </div>
                             </div>
+                        )}
+                        {activeView === 'TERMINAL' && (
+                            <TerminalView onCaptureError={captureTerminalError} />
                         )}
 
                         {activeView === 'LOGS' && (

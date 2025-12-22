@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Free-sor",
+  "name": "Quarkonix \uD83D\uDD2E",
   "version": "1.0.0",
-  "action": { "default_title": "Open Free-sor" },
+  "action": { "default_title": "Open Quarkonix" },
   "side_panel": { "default_path": "index.html" },
   "permissions": ["sidePanel", "storage", "tabs"],
   "host_permissions": ["*://chatgpt.com/*", "*://gemini.google.com/*", "*://claude.ai/*"],
