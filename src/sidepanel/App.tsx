@@ -4,6 +4,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView } from '@codemirror/view';
 import TerminalView from "./terminal/TerminalView.tsx";
+import Settings, {type UserSettings } from './settings/Settings.tsx';
 
 const scrollFix = `
   .cm-theme-vscode-dark, .cm-editor { 
@@ -50,7 +51,7 @@ const scrollFix = `
   }
 `;
 
-type ViewState = 'EDITOR' | 'CONTEXT' | 'LOGS' | 'DIFF' | 'TERMINAL';
+type ViewState = 'EDITOR' | 'CONTEXT' | 'LOGS' | 'DIFF' | 'TERMINAL' | 'SETTINGS';
 
 interface EditorTab {
     id: string;
@@ -99,6 +100,15 @@ export default function App() {
     const [showAskButton, setShowAskButton] = useState(false);
     const [buttonPos, setButtonPos] = useState({ x: 0, y: 0 });
     const editorViewRef = useRef<EditorView | null>(null);
+    const [settings, setSettings] = useState<UserSettings>({
+        executionMode: 'CLI',
+        autoSync: false,
+        aiModel: 'GPT-4o (Full)'
+    });
+
+    const updateSettings = (newSet: Partial<UserSettings>) => {
+        setSettings(prev => ({ ...prev, ...newSet }));
+    };
 
     const activeTab = tabs.find(t => t.id === activeTabId) || null;
 
@@ -491,7 +501,7 @@ ${projectMap}
 
                             <div className="mb-4 p-3 bg-[#1e1e1e] rounded-lg border border-[#333]">
                                 <div className="text-[10px] uppercase text-zinc-500 mb-2">Selected Code ({capturedSelection.split('\n').length} lines)</div>
-                                <pre className="text-xs text-zinc-400 max-h-32 overflow-auto scrollbar font-mono">{capturedSelection}</pre>
+                                <pre className="text-[15px] text-zinc-400 max-h-64 overflow-auto scrollbar font-bold tracking-wide">{capturedSelection}</pre>
                             </div>
 
                             <textarea
@@ -597,15 +607,23 @@ ${projectMap}
                         🐚
                     </button>
                     <button onClick={() => setActiveView('LOGS')} className={`w-full mt-auto py-4 ${activeView === 'LOGS' ? 'text-white border-l-2 border-[#007acc]' : 'text-zinc-500'}`}>🗃️</button>
+                    <button
+                        onClick={() => setActiveView('SETTINGS')}
+                        className={`w-full mt-2 py-4 ${activeView === 'SETTINGS' ? 'text-white border-l-2 border-[#007acc]' : 'text-zinc-500 hover:text-white'}`}
+                    >
+                        ⚙️
+                    </button>
                 </aside>
+                {activeView === 'DIFF' || activeView === 'EDITOR' && (
+                    <aside className="w-42 bg-[#252526] border-r border-[#1e1e1e] flex flex-col shrink-0 h-full overflow-hidden">
+                        <div className="p-3 text-[11px] uppercase font-bold border-b border-[#1e1e1e] flex justify-between">
+                            <span>Explorer 🗻</span>
+                            {dirHandle && <button onClick={() => buildTree(dirHandle).then(setFileTree)} className="hover:text-white">↻</button>}
+                        </div>
+                        <div className="flex-1 overflow-auto scrollbar py-2 custom-scrollbar">{renderTree(fileTree)}</div>
+                    </aside>
+                )}
 
-                <aside className="w-42 bg-[#252526] border-r border-[#1e1e1e] flex flex-col shrink-0 h-full overflow-hidden">
-                    <div className="p-3 text-[11px] uppercase font-bold border-b border-[#1e1e1e] flex justify-between">
-                        <span>Explorer 🗻</span>
-                        {dirHandle && <button onClick={() => buildTree(dirHandle).then(setFileTree)} className="hover:text-white">↻</button>}
-                    </div>
-                    <div className="flex-1 overflow-auto scrollbar py-2 custom-scrollbar">{renderTree(fileTree)}</div>
-                </aside>
 
                 <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
                     <header className="h-9 bg-[#252526] flex items-center overflow-x-auto no-scrollbar border-b border-[#1e1e1e] shrink-0">
@@ -620,6 +638,9 @@ ${projectMap}
                     </header>
 
                     <main className="flex-1 flex flex-col min-h-0 w-full overflow-hidden bg-[#1e1e1e]">
+                        {activeView === 'SETTINGS' && (
+                            <Settings settings={settings} updateSettings={updateSettings} />
+                        )}
                         {activeView === 'EDITOR' && (
                             activeTab ? (
                                 <div className="flex flex-col h-full w-full">
