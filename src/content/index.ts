@@ -25,18 +25,22 @@ const injectButton = (codeBlock: HTMLElement) => {
     });
 
     btn.onclick = () => {
-        // 1. Get the code text
         const code = codeBlock.querySelector('code')?.innerText || "";
 
-        // 2. Try to find a filename comment (e.g., // index.js or # main.py)
-        const firstLine = code.split('\n')[0];
-        const fileNameMatch = firstLine.match(/(?:\/\/|#|--)\s*([\w.-]+\.\w+)/);
-        const filename = fileNameMatch ? fileNameMatch[1] : 'generated_file.txt';
+        // 1. Try to find filename from a common LLM attribute (e.g., ChatGPT/Claude)
+        let filename = codeBlock.getAttribute('data-filename') ||
+            codeBlock.querySelector('.file-name')?.textContent;
 
-        // 3. Send to the Side Panel
+        // 2. Fallback to your Regex if no attribute exists
+        if (!filename) {
+            const firstLine = code.split('\n')[0];
+            const fileNameMatch = firstLine.match(/(?:\/\/|#|--|---\s+FILE:)\s*([\w./-]+\.\w+)/);
+            filename = fileNameMatch ? fileNameMatch[1] : 'generated_file.txt';
+        }
+
         chrome.runtime.sendMessage({
             type: 'SYNC_CODE',
-            payload: { code, filename }
+            payload: { code, filename: filename.trim() }
         });
 
         btn.innerText = '✅ Sent!';

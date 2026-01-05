@@ -18,6 +18,25 @@ dist-ssr
 .idea
 .DS_Store
 *.suo
+*.sln
+*.sw?
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE specific files
+*.iml
+.gradle
+.idea/
+
+# OS specific files
+Thumbs.db
+
+# Build artifacts
+coverage/
+.nyc_output/
 *.ntvs*
 *.njsproj
 *.sln

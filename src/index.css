@@ -26,3 +26,51 @@
 .scrollbar::-webkit-scrollbar-track {
   background-color: #1e1e1e;
 }
+
+/* src/index.css */
+
+/* CodeMirror Fixes */
+.cm-theme-vscode-dark, .cm-editor {
+  height: 100% !important;
+  width: 100% !important;
+}
+.cm-scroller {
+  overflow: auto !important;
+  display: block !important;
+}
+
+/* Custom Scrollbar */
+.cm-scroller::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.cm-scroller::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 6px;
+}
+.cm-scroller::-webkit-scrollbar-track {
+  background-color: #1e1e1e;
+}
+
+/* Ask AI Floating Button */
+.ask-ai-button {
+  position: fixed;
+  background: linear-gradient(135deg, #007acc, #5b9bd5);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0, 122, 204, 0.5);
+  z-index: 10000;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255,255,255,0.3);
+  pointer-events: auto;
+  user-select: none;
+}
+.ask-ai-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: linear-gradient(135deg, #1f8ad2, #6eb0e6);
+  box-shadow: 0 6px 20px rgba(0, 122, 204, 0.7);
+}
